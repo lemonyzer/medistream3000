@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MSSQLServer;DB_CLOSE_ON_EXIT=FALSE;
+    driverClassName: org.h2.Driver
+    username: sa
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        #dialect: org.hibernate.dialect.H2Dialect
+        default_schema:
+        show_sql: true
+  kafka:
+    enabled: false
+
+logging:
+  level:
+    com.shortcutz: debug
