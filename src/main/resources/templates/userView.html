@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Homepage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link th:href="@{/webjars/bootstrap/5.2.3/css/bootstrap.min.css}" rel="stylesheet" />
+  <script th:src="@{/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js}" defer></script>
+  <script th:src="@{/webjars/htmx.org/1.8.5/dist/htmx.min.js}" defer></script>
+</head>
+<style>
+  table,th,td {
+    border:1px solid black;
+    padding: 5px;
+  }
+</style>
+<body>
+<main class="my-5">
+  <div class="container">
+    <h1 class="mb-4">Homepage</h1>
+    <p class="mb-5 js-greeting">Hello World!</p>
+    <button>Change greeting</button>
+  </div>
+  <div id="users" class="container">
+    <h1 class="mb-4"><span th:text="${heading}"></span></h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td th:text="${name}"></td>
+          <td th:text="${age}"></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="mb-5 js-greeting">Hello World!</p>
+    <button>Change greeting</button>
+  </div>
+  <div th:text="${#calendars.format(cal)}">Calendar Format</div>
+  <div th:text="${#calendars.formatISO(cal)}">Calendar Format ISO</div>
+  <div th:text="${#calendars.create(2022, 12, 31)}">Create Calendar</div>
+  <div th:text="${#calendars.day(cal)}">Day of Month</div>
+</main>
+</body>
+</html>
