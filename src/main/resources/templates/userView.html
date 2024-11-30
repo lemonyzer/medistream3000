@@ -40,10 +40,14 @@
     <p class="mb-5 js-greeting">Hello World!</p>
     <button>Change greeting</button>
   </div>
-  <div th:text="${#calendars.format(cal)}">Calendar Format</div>
-  <div th:text="${#calendars.formatISO(cal)}">Calendar Format ISO</div>
-  <div th:text="${#calendars.create(2022, 12, 31)}">Create Calendar</div>
-  <div th:text="${#calendars.day(cal)}">Day of Month</div>
+  <div th:text="${#calendars.format(cal)}">Calendar Format</div><br>
+  <br>
+  <div th:text="${#calendars.formatISO(cal)}">Calendar Format ISO</div><br>
+  <br>
+  <div th:text="${#calendars.create(2022, 12, 31)}">Create Calendar</div><br>
+  <br>
+  <div th:text="${#calendars.day(cal)}">Day of Month</div><br>
+  <br>
 </main>
 </body>
 </html>

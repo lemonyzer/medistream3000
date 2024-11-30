@@ -1,10 +1,12 @@
 package com.shortcutz.medistream3000.data
 
-import jakarta.annotation.PostConstruct
 import jakarta.persistence.*
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.format.annotation.DateTimeFormat
+import java.io.Serializable
 import java.time.Instant
 import java.util.*
+
 
 @Entity
 @Table(name = "patient")
@@ -98,6 +100,8 @@ interface MediStreamEntityRepository : JpaRepository<MediStreamEntity, UUID> {
 class AppointmentEntity(
     @Id
     @Column(nullable = false)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     var appointmentUuid: UUID,
 
     @Column(nullable = false)
@@ -181,5 +185,140 @@ interface RoomEntityRepository : JpaRepository<RoomEntity, UUID> {
 //            this.save(RoomEntity(UUID.randomUUID(), "Room-$i", i, 2))
 //        }
 //    }
+
+}
+
+
+// WARE ! SHARE IT
+//
+//// TODO: many to many??
+////    @ManyToOne
+////    @JoinColumn(name = "mediStreamUuid")
+////    var mediStreamEntity: MediStreamEntity,
+//
+//@Entity
+//@Table(name = "appointments")
+//class WareEntity(
+// 	      @Id
+//	      @GeneratedValue(strategy = GenerationType.AUTO)
+//	      private long id;
+//    @Id
+//    @Column(nullable = false)
+//    var wareUuid: UUID,
+//
+//
+////    @JoinColumn(name = "mediStreamUuid")
+////    var roomUuid: RoomEntity,
+////
+////    @JoinColumn(name = "mediStreamUuid")
+////    var mediStreamUuid: MediStreamEntity,
+//
+//    @Column(nullable = false)//, length = DATA_TYPE_MAX_LEN)
+//    val dataType: String,
+//
+//    @Column(nullable = false)//, length = PARTNER_ID_MAX_LEN)
+//    val userId: String,
+//
+//    @Column(nullable = false, unique = true)
+//    var lastEventUuid: UUID,
+//
+//    @Column( name = "last_event_ts", nullable = false)
+//    var lastEventTs: Instant,
+//
+//    @Column( name = "first_event_ts", nullable = false)
+//    val firstEventTs: Instant,
+//
+//    @Column( name = "first_appointment", nullable = false)
+//    val firstAppointmentTime: Instant,
+//
+////    //date, place / room aka  medistream 1 / 2
+////    // val localDate = LocalDate.of(2022, 12, 31)
+////    //val sqlDate = java.sql.Date.valueOf(localDate)
+////    //var date: ,
+////    val localDate: Any = LocalDate.of(2022, 12, 31)
+////    val sqlDate = java.sql.Date.valueOf(localDate)
+//
+//    @Column(nullable = false)//, length = ROOM_NAME_MAX_LEN)
+//    val medistreamId: Int = 1,
+//
+//    @Column(nullable = false)
+//    val roomNumber: Int = 123,
+//
+//    @Column(nullable = false)
+//    val beds: Int = 1,
+//
+//    ) {
+//    @Version
+//    var version: Int? = null
+//
+//    override fun toString(): String {
+//        return "Ware(appointment=$firstAppointmentTime, roomNumber=$roomNumber, firstEventTs=$firstEventTs, beds=$beds, beds=$beds, version=$version)"
+//    }
+//}
+//
+//
+//interface WareRepository : JpaRepository<WareEntity, UUID> {
+//
+//    fun findByRoomUuid(wareUuid: UUID): WareEntity?
+//
+////    fun findEmptyRoom(): WareEntity? {
+////
+////    }
+//
+//    fun save(entity: WareEntity): WareEntity
+//
+////    @PostConstruct
+////    fun init() {
+////
+////        var amountOfRooms = 20
+////        for (i in 1 .. amountOfRooms) {
+////            this.save(WareEntity(UUID.randomUUID(), "Room-$i", i, 2))
+////        }
+////    }
+//
+//}
+
+// AppointmentEntity
+@Entity
+@Table(name = "appointments_simple")
+class Appointment (
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long,
+
+    @Column(nullable = false)
+    var appointmentUuid: UUID,
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    var appointmentDate: Date? = null,
+
+    @Column(nullable = true)
+    var duration: Int = 25,
+
+    @Column(nullable = true)
+    var medistreamId: Long,
+)
+
+interface AppointmentRepository : JpaRepository<Appointment, Long> {
+
+    //fun findById(id: Long): Appointment?
+
+    fun findByAppointmentUuid(appointmentUuid: UUID): Appointment?
+
+    fun findAllByAppointmentDate(appointmentDate: Date): List<Appointment>?
+
+    fun findByAppointmentDate(appointmentDate: Date): Appointment?
+
+    fun findByMedistreamId(medistreamId: Long) : List<Appointment>?
+
+
+    fun save(entity: Appointment): Appointment
+
+}
+
+class Student : Serializable {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private val birthDate: Date? = null
 
 }

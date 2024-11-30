@@ -8,7 +8,8 @@ import java.util.*
 @Service
 class InitializerService(
     val roomRepo : RoomEntityRepository,
-    val patientRepo : PatientEntityRepository
+    val patientRepo : PatientEntityRepository,
+    val appointmentRepo : AppointmentRepository
 ) {
 
     @PostConstruct
@@ -22,7 +23,7 @@ class InitializerService(
             roomRepo.save(RoomEntity(UUID.randomUUID(), "Room-$i", i, 2))
         }
         roomRepo.flush()
-        staticLogger.info("roomRepo initialized")
+        staticLogger.info("---> roomRepo initialized")
 
         var rooms = roomRepo.findAll()
 
@@ -33,10 +34,19 @@ class InitializerService(
 //            patientRepo.save(PatientEntity(UUID.randomUUID(),i.toLong(),"$i","Nach${i + i}", RoomEntity(UUID.randomUUID(),"room-$i",i,2)))
         }
         patientRepo.flush()
-        staticLogger.info("patientRepo initialized")
+        staticLogger.info("---> patientRepo initialized")
 
 
-        staticLogger.info("Rooms and Patients initialized")
+        var amountOfAppointments = 10
+        for (i in 1 .. amountOfPatients) {
+            staticLogger.info("---> saving appointment $i")
+            appointmentRepo.save(Appointment(0,UUID.randomUUID(), medistreamId = (i%2).toLong()))//PatientEntity(UUID.randomUUID(),i.toLong(),"$i","Nach${i + i}", rooms.get(i)))
+//            patientRepo.save(PatientEntity(UUID.randomUUID(),i.toLong(),"$i","Nach${i + i}", RoomEntity(UUID.randomUUID(),"room-$i",i,2)))
+        }
+        appointmentRepo.flush()
+        staticLogger.info("---> appointmentRepo initialized")
+
+        staticLogger.info("---> Rooms, Patients and Appointments initialized")
 
     }
 

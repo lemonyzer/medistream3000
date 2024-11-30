@@ -2,12 +2,13 @@ spring:
   application:
     name: medistream3000
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MSSQLServer;DB_CLOSE_ON_EXIT=FALSE;
+    url: jdbc:h2:mem:testdb #;MODE=MSSQLServer;DB_CLOSE_ON_EXIT=FALSE;
     driverClassName: org.h2.Driver
     username: sa
   h2:
     console:
       enabled: true
+      path: /h2-ui  #TODO: security remove on PROD
   jpa:
     hibernate:
       ddl-auto: create-drop
