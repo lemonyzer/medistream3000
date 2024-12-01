@@ -299,6 +299,9 @@ class Appointment (
     @Column(nullable = true)
     var medistreamId: Long,
 
+    @Column(nullable = true)
+    var booked: Int = 0,
+
     @Column( name = "start_ts", nullable = false)
     val startTimestamp: Instant,
 
@@ -316,6 +319,11 @@ interface AppointmentRepository : JpaRepository<Appointment, Long> {
     fun findByAppointmentUuid(appointmentUuid: UUID): Appointment?
 
     fun findAllByAppointmentDate(appointmentDate: Date): List<Appointment>?
+
+    fun findByStartTimestampAfter(startTimestamp: Instant): List<Appointment>?
+    fun findByStartTimestampGreaterThanEqual(startTimestamp: Instant): List<Appointment>?
+
+    fun findByStartTimestampBetween(startTimestamp: Instant, endTimestamp: Instant): List<Appointment>?
 
     fun findByAppointmentDate(appointmentDate: Date): Appointment?
 

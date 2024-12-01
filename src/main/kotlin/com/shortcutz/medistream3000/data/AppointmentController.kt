@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -25,6 +26,44 @@ class AppointmentController (
 
             if (appointmentDate == null) appointmentRepository.findAll().forEach(appointmentsList::add)
             else appointmentRepository.findAllByAppointmentDate(appointmentDate)?.forEach(appointmentsList::add)
+
+            if (appointmentsList.isEmpty()) {
+                return ResponseEntity<List<Appointment>?>(HttpStatus.NO_CONTENT)
+            }
+
+            return ResponseEntity<List<Appointment>?>(appointmentsList, HttpStatus.OK)
+        } catch (e: Exception) {
+            return ResponseEntity<List<Appointment>?>(null, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @GetMapping("/today-appointments")
+    fun getAllTodayAppointments() : ResponseEntity<List<Appointment>?> {
+        try {
+            val appointmentsList: ArrayList<Appointment> = ArrayList<Appointment>()
+
+            appointmentRepository.findByStartTimestampBetween(
+                Instant.now().truncatedTo(ChronoUnit.DAYS),
+                Instant.now().truncatedTo(ChronoUnit.DAYS).plus(1,ChronoUnit.DAYS))?.forEach(appointmentsList::add)
+
+            if (appointmentsList.isEmpty()) {
+                return ResponseEntity<List<Appointment>?>(HttpStatus.NO_CONTENT)
+            }
+
+            return ResponseEntity<List<Appointment>?>(appointmentsList, HttpStatus.OK)
+        } catch (e: Exception) {
+            return ResponseEntity<List<Appointment>?>(null, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @GetMapping("/week-appointments")
+    fun getAllWeekAppointments(@RequestParam(required = false) weekDay: Instant?) : ResponseEntity<List<Appointment>?> {
+        try {
+            val appointmentsList: ArrayList<Appointment> = ArrayList<Appointment>()
+
+            if (weekDay == null) appointmentRepository.findAll().forEach(appointmentsList::add)
+            else appointmentRepository.findByStartTimestampGreaterThanEqual(weekDay.truncatedTo(ChronoUnit.DAYS))?.forEach(appointmentsList::add)
+//            else appointmentRepository.findByStartTimestampAfter(weekDay.truncatedTo(ChronoUnit.DAYS))?.forEach(appointmentsList::add)
 
             if (appointmentsList.isEmpty()) {
                 return ResponseEntity<List<Appointment>?>(HttpStatus.NO_CONTENT)
@@ -57,7 +96,8 @@ class AppointmentController (
     fun createAppointment(@RequestBody appointment: Appointment): ResponseEntity<Appointment> {
         try {
             var _appointment =
-                appointmentRepository.save(Appointment(appointment.id, appointment.appointmentUuid, appointment.appointmentDate, appointment.duration, appointment.medistreamId, appointment.startTimestamp));
+                appointmentRepository.save(
+                    Appointment(appointment.id, appointment.appointmentUuid, appointment.appointmentDate, appointment.duration, appointment.medistreamId, appointment.booked, appointment.startTimestamp));
             return ResponseEntity<Appointment>(_appointment, HttpStatus.CREATED);
         } catch (e: Exception) {
             return ResponseEntity<Appointment>(null, HttpStatus.INTERNAL_SERVER_ERROR);
