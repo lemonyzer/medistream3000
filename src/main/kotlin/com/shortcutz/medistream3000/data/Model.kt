@@ -298,6 +298,15 @@ class Appointment (
 
     @Column(nullable = true)
     var medistreamId: Long,
+
+    @Column( name = "start_ts", nullable = false)
+    val startTimestamp: Instant,
+
+    //    @Column(name = "created_at", nullable = false, updatable = false)
+    //    var  createdAt : LocalDateTime = LocalDateTime.now(),
+    //
+    //    @Column(name = "updated_at")
+    //    var updatedAt : LocalDateTime,
 )
 
 interface AppointmentRepository : JpaRepository<Appointment, Long> {

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import java.time.Instant
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -56,7 +57,7 @@ class AppointmentController (
     fun createAppointment(@RequestBody appointment: Appointment): ResponseEntity<Appointment> {
         try {
             var _appointment =
-                appointmentRepository.save(Appointment(appointment.id, appointment.appointmentUuid, appointment.appointmentDate, appointment.duration, appointment.medistreamId));
+                appointmentRepository.save(Appointment(appointment.id, appointment.appointmentUuid, appointment.appointmentDate, appointment.duration, appointment.medistreamId, appointment.startTimestamp));
             return ResponseEntity<Appointment>(_appointment, HttpStatus.CREATED);
         } catch (e: Exception) {
             return ResponseEntity<Appointment>(null, HttpStatus.INTERNAL_SERVER_ERROR);
