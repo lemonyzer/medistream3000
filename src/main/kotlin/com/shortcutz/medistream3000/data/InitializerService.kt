@@ -70,13 +70,18 @@ class InitializerService(
 
 
                 staticLogger.info("---> Instant.now + 2 Days = " + Instant.now().plus(2, ChronoUnit.DAYS).toString())
+
+                var startTs = Instant.now().truncatedTo(ChronoUnit.HOURS).
+                plus((day-1).toLong(),ChronoUnit.DAYS).
+                plus(time.toLong(),ChronoUnit.HOURS)
+
                 appointmentRepo.save(
                     Appointment(0,UUID.randomUUID(),
                         medistreamId = ((day+time)%2).toLong(),
-                        startTimestamp = Instant.now().truncatedTo(ChronoUnit.HOURS).
-                        plus((day-1).toLong(),ChronoUnit.DAYS).
-                        plus(time.toLong(),ChronoUnit.HOURS),
-                        booked = time%2))
+                        startTimestamp = startTs,
+                        booked = time%2,
+                        appointmentDate = Date.from(startTs)))
+
             }
         }
         appointmentRepo.flush()

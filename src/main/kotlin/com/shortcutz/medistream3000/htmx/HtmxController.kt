@@ -1,8 +1,6 @@
 package com.shortcutz.medistream3000.htmx
 
-import com.shortcutz.medistream3000.data.Appointment
-import com.shortcutz.medistream3000.data.AppointmentController
-import com.shortcutz.medistream3000.data.AppointmentRepository
+import com.shortcutz.medistream3000.data.*
 import mu.KotlinLogging
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -16,7 +14,9 @@ import java.time.temporal.ChronoUnit
 
 @Controller
 class HtmxController (
-    var appointmentRepository: AppointmentRepository
+    var appointmentRepository: AppointmentRepository,
+    var roomEntityRepository: RoomEntityRepository,
+    var patientEntityRepository: PatientEntityRepository
 ) {
 
     @RequestMapping("")
@@ -45,6 +45,8 @@ class HtmxController (
         staticLogger.info("amount of appointments today: ${appointmentsList.count()}")
 
         model.addAttribute("appointments", appointmentsList)
+        model.addAttribute("rooms", roomEntityRepository.findAll())
+        model.addAttribute("patienten", patientEntityRepository.findAll())
         return "appointment"
     }
 
