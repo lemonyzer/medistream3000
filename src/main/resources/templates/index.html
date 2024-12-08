@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="${title}">My Blog</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- https://pagedone.io/blocks/application/calendar -->
     <script
       src="https://unpkg.com/htmx.org@2.0.2"
       integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
@@ -15,11 +16,29 @@
         if (event.detail.target.id === 'posts-list') {
           document.getElementById('edit-post-form').innerHTML = '';
         }
+        if (event.detail.target.id === 'appointments-list') {
+          document.getElementById('edit-appointment-form').innerHTML = '';
+        }
       });
     </script>
   </head>
   <body class="bg-gray-100">
     <div th:replace="~{layout/header :: header}"></div>
+
+
+    <div class="container mx-auto mt-4">
+      <div th:switch="${content3}">
+        <div th:case="'next-x-days-calendar'">
+          <div th:replace="~{medistream/next-x-days-calendar :: next-x-days-calendar}"></div>
+        </div>
+
+        <div th:case="*">
+          <p>No matching content</p>
+        </div>
+      </div>
+    </div>
+
+
 
     <div class="container mx-auto mt-4">
       <div th:switch="${content}">
@@ -32,5 +51,19 @@
         </div>
       </div>
     </div>
+
+    <div class="container mx-auto mt-4">
+      <div th:switch="${content2}">
+        <div th:case="'all-appointments'">
+          <div th:replace="~{blog/all-appointments :: all-appointments}"></div>
+        </div>
+
+        <div th:case="*">
+          <p>No matching content</p>
+        </div>
+      </div>
+    </div>
+
+
   </body>
 </html>

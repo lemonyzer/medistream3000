@@ -2,7 +2,6 @@ package com.shortcutz.medistream3000.data
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -42,7 +41,7 @@ class AppointmentController (
         try {
             val appointmentsList: ArrayList<Appointment> = ArrayList<Appointment>()
 
-            appointmentRepository.findByStartTimestampBetween(
+            appointmentRepository.findByStartTimestampBetweenOrderByStartTimestampAsc(
                 Instant.now().truncatedTo(ChronoUnit.DAYS),
                 Instant.now().truncatedTo(ChronoUnit.DAYS).plus(1,ChronoUnit.DAYS))?.forEach(appointmentsList::add)
 
@@ -97,7 +96,21 @@ class AppointmentController (
         try {
             var _appointment =
                 appointmentRepository.save(
-                    Appointment(appointment.id, appointment.appointmentUuid, appointment.appointmentDate, appointment.duration, appointment.medistreamId, appointment.booked, appointment.startTimestamp));
+                    Appointment(
+                        appointment.id,
+                        appointment.appointmentUuid,
+                        appointment.appointmentDate,
+                        appointment.dayLabel,
+                        appointment.dayName,
+                        appointment.dayNameAbbreviator,
+                        appointment.monthName,
+                        appointment.dayOfMonth,
+                        appointment.duration,
+                        appointment.medistreamId,
+                        appointment.booked,
+                        appointment.startTimestamp,
+                        appointment.startTime,
+                        appointment.finishTime));
             return ResponseEntity<Appointment>(_appointment, HttpStatus.CREATED);
         } catch (e: Exception) {
             return ResponseEntity<Appointment>(null, HttpStatus.INTERNAL_SERVER_ERROR);

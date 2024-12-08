@@ -5,10 +5,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.RequestMapping
-import java.sql.Date
 import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 
@@ -38,7 +35,7 @@ class HtmxController (
         staticLogger.info("${this.javaClass} - getAppointments")
 
         val appointmentsList: ArrayList<Appointment> = ArrayList<Appointment>()
-        appointmentRepository.findByStartTimestampBetween(
+        appointmentRepository.findByStartTimestampBetweenOrderByStartTimestampAsc(
             Instant.now().truncatedTo(ChronoUnit.DAYS),
             Instant.now().truncatedTo(ChronoUnit.DAYS).plus(1, ChronoUnit.DAYS))?.forEach(appointmentsList::add)
 

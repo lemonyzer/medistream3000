@@ -1,0 +1,58 @@
+<section th:fragment="all-appointments">
+  <h2 class="text-2xl font-bold text-gray-800 mb-4">Blog Appointments</h2>
+
+  <form
+    id="create-appointment-form"
+    hx-post="/htmx/posts/appointment"
+    hx-target="#appointments-list"
+    hx-swap="innerHTML"
+  >
+    <div class="mb-4">
+      <label for="appointment-startTimestamp" class="block text-gray-700">New Appointment:</label>
+      <textarea
+        id="appointment-startTimestamp"
+        name="text"
+        rows="3"
+        class="w-full p-2 border rounded"
+      ></textarea>
+    </div>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+      Create Appointment
+    </button>
+  </form>
+
+  <div id="appointments-list" class="space-y-6 mt-4">
+    <div th:each="appointment : ${appointments}" class="p-6 bg-white shadow-md rounded-lg">
+      <p class="text-gray-700" th:text="'id: ' + ${appointment.id}">id</p>
+      <p class="text-gray-700" th:text="'StartTs: ' + ${appointment.startTimestamp}">Appointment Content</p>
+      <p class="text-gray-700" th:text="'startTime: ' + ${appointment.startTime}">Appointment Content</p>
+      <p class="text-gray-700" th:text="'finishTime: ' + ${appointment.finishTime}">Appointment Content</p>
+      <p class="text-gray-700" th:text="'duration: ' + ${appointment.duration}">Appointment Duration</p>
+      <p class="text-gray-700" th:text="'medistream: ' + ${appointment.medistreamId}">medistreamId</p>
+      <p class="text-gray-700" th:text="'booked: ' + ${appointment.booked}">booked</p>
+      <p class="text-gray-700" th:text="'dayLabel: ' + ${appointment.dayLabel}">dayLabel</p>
+
+      <div class="flex space-x-2 mt-2">
+        <button
+          th:attr="hx-get=@{/htmx/posts/appointment/{id}/edit(id=${appointment.id})}"
+          hx-target="#edit-appointment-form"
+          hx-swap="innerHTML"
+          class="bg-yellow-500 text-white px-4 py-2 rounded"
+        >
+          Edit
+        </button>
+
+        <button
+          th:attr="hx-delete=@{/htmx/posts/appointment/{id}(id=${appointment.id})}"
+          hx-target="#appointments-list"
+          hx-swap="innerHTML"
+          class="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-appointment-form" class="mt-4"></div>
+</section>

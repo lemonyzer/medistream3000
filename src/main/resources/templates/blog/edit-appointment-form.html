@@ -1,0 +1,42 @@
+<form
+  id="edit-form-container"
+  th:attr="hx-patch=@{/htmx/posts/appointment/{id}(id=${appointment.id})}"
+  hx-target="#appointments-list"
+  hx-swap="innerHTML"
+>
+  <div class="mb-4">
+    <label for="edit-appointment-text" class="block text-gray-700">Edit Appointment:</label>
+    <textarea
+      id="edit-appointment-text"
+      name="text"
+      rows="3"
+      class="w-full p-2 border rounded"
+      th:text="${appointment.startTimestamp}"
+    ></textarea>
+    <br>
+    <label>appointmentId:</label>
+    <input type="number" name="id" readonly th:value="${appointment.id}">
+    <br>
+    <label>startTimestamp:</label><label th:text="' raw data: ' + ${appointment.startTimestamp}"></label>
+    <br>
+    <input type="datetime-local" step="1" name="startTimestamp" th:value="${#dates.format(appointment.startTimestamp, 'yyyy-MM-dd''T''HH:mm:ss')}">
+    <br>
+    <label>starTime:</label>
+    <input type="time" name="starTime" th:value="${appointment.startTime}">
+    <br>
+    <label>finishTime:</label>
+    <input type="time" name="finishTime" th:value="${appointment.finishTime}">
+    <br>
+    <label>duration:</label>
+    <input type="number" name="duration" th:value="${appointment.duration}">
+    <br>
+    <label>booked:</label>
+    <input type="number" name="booked" th:value="${appointment.booked}">
+    <br>
+    <label>medistreamId:</label>
+    <input type="number" name="medistreamId" th:value="${appointment.medistreamId}">
+  </div>
+  <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+    Update Post
+  </button>
+</form>

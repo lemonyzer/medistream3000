@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title}">My Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- https://pagedone.io/blocks/application/calendar -->
+    <script
+      src="https://unpkg.com/htmx.org@2.0.2"
+      integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      document.addEventListener('htmx:afterRequest', function (event) {
+        if (event.detail.target.id === 'posts-list') {
+          document.getElementById('edit-post-form').innerHTML = '';
+        }
+        if (event.detail.target.id === 'appointments-list') {
+          document.getElementById('edit-appointment-form').innerHTML = '';
+        }
+      });
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <div th:replace="~{layout/header :: header}"></div>
+
+    <div class="container mx-auto mt-4">
+      <div th:switch="${content}">
+        <div th:case="'all-posts'">
+          <div th:replace="~{blog/all-posts :: all-posts}"></div>
+        </div>
+
+        <div th:case="*">
+          <p>No matching content</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto mt-4">
+      <div th:switch="${content2}">
+        <div th:case="'all-appointments'">
+          <div th:replace="~{blog/all-appointments :: all-appointments}"></div>
+        </div>
+
+        <div th:case="*">
+          <p>No matching content</p>
+        </div>
+      </div>
+    </div>
+
+<!--    <div th:each="row : ${listOfExtAppointment}">-->
+<!--      <div th:each="rowAppointment : ${row.appointments}">-->
+<!--        <div>-->
+<!--          <span th:text="${row.startTime}"></span>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <div>-->
+<!--            <p th:text="'MS(' + ${rowAppointment.medistreamId} + ') - ' + ${rowAppointment.id}"></p>-->
+<!--            <p th:text="${rowAppointment.startTime}"></p>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <section class="relative bg-stone-50 py-24">
+      <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+        <div class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between mb-5">
+          <div class="flex items-center gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M17 4.50001L17 5.15001L17 4.50001ZM6.99999 4.50002L6.99999 3.85002L6.99999 4.50002ZM8.05078 14.65C8.40977 14.65 8.70078 14.359 8.70078 14C8.70078 13.641 8.40977 13.35 8.05078 13.35V14.65ZM8.00078 13.35C7.6418 13.35 7.35078 13.641 7.35078 14C7.35078 14.359 7.6418 14.65 8.00078 14.65V13.35ZM8.05078 17.65C8.40977 17.65 8.70078 17.359 8.70078 17C8.70078 16.641 8.40977 16.35 8.05078 16.35V17.65ZM8.00078 16.35C7.6418 16.35 7.35078 16.641 7.35078 17C7.35078 17.359 7.6418 17.65 8.00078 17.65V16.35ZM12.0508 14.65C12.4098 14.65 12.7008 14.359 12.7008 14C12.7008 13.641 12.4098 13.35 12.0508 13.35V14.65ZM12.0008 13.35C11.6418 13.35 11.3508 13.641 11.3508 14C11.3508 14.359 11.6418 14.65 12.0008 14.65V13.35ZM12.0508 17.65C12.4098 17.65 12.7008 17.359 12.7008 17C12.7008 16.641 12.4098 16.35 12.0508 16.35V17.65ZM12.0008 16.35C11.6418 16.35 11.3508 16.641 11.3508 17C11.3508 17.359 11.6418 17.65 12.0008 17.65V16.35ZM16.0508 14.65C16.4098 14.65 16.7008 14.359 16.7008 14C16.7008 13.641 16.4098 13.35 16.0508 13.35V14.65ZM16.0008 13.35C15.6418 13.35 15.3508 13.641 15.3508 14C15.3508 14.359 15.6418 14.65 16.0008 14.65V13.35ZM16.0508 17.65C16.4098 17.65 16.7008 17.359 16.7008 17C16.7008 16.641 16.4098 16.35 16.0508 16.35V17.65ZM16.0008 16.35C15.6418 16.35 15.3508 16.641 15.3508 17C15.3508 17.359 15.6418 17.65 16.0008 17.65V16.35ZM8.65 3C8.65 2.64101 8.35898 2.35 8 2.35C7.64102 2.35 7.35 2.64101 7.35 3H8.65ZM7.35 6C7.35 6.35899 7.64102 6.65 8 6.65C8.35898 6.65 8.65 6.35899 8.65 6H7.35ZM16.65 3C16.65 2.64101 16.359 2.35 16 2.35C15.641 2.35 15.35 2.64101 15.35 3H16.65ZM15.35 6C15.35 6.35899 15.641 6.65 16 6.65C16.359 6.65 16.65 6.35899 16.65 6H15.35ZM6.99999 5.15002L17 5.15001L17 3.85001L6.99999 3.85002L6.99999 5.15002ZM20.35 8.50001V17H21.65V8.50001H20.35ZM17 20.35H7V21.65H17V20.35ZM3.65 17V8.50002H2.35V17H3.65ZM7 20.35C6.03882 20.35 5.38332 20.3486 4.89207 20.2826C4.41952 20.2191 4.1974 20.1066 4.04541 19.9546L3.12617 20.8739C3.55996 21.3077 4.10214 21.4881 4.71885 21.571C5.31685 21.6514 6.07557 21.65 7 21.65V20.35ZM2.35 17C2.35 17.9245 2.34862 18.6832 2.42902 19.2812C2.51193 19.8979 2.69237 20.4401 3.12617 20.8739L4.04541 19.9546C3.89341 19.8026 3.78096 19.5805 3.71743 19.108C3.65138 18.6167 3.65 17.9612 3.65 17H2.35ZM20.35 17C20.35 17.9612 20.3486 18.6167 20.2826 19.108C20.219 19.5805 20.1066 19.8026 19.9546 19.9546L20.8738 20.8739C21.3076 20.4401 21.4881 19.8979 21.571 19.2812C21.6514 18.6832 21.65 17.9245 21.65 17H20.35ZM17 21.65C17.9244 21.65 18.6831 21.6514 19.2812 21.571C19.8979 21.4881 20.44 21.3077 20.8738 20.8739L19.9546 19.9546C19.8026 20.1066 19.5805 20.2191 19.1079 20.2826C18.6167 20.3486 17.9612 20.35 17 20.35V21.65ZM17 5.15001C17.9612 5.15 18.6167 5.15138 19.1079 5.21743C19.5805 5.28096 19.8026 5.39341 19.9546 5.54541L20.8738 4.62617C20.44 4.19238 19.8979 4.01194 19.2812 3.92902C18.6831 3.84862 17.9244 3.85001 17 3.85001L17 5.15001ZM21.65 8.50001C21.65 7.57557 21.6514 6.81686 21.571 6.21885C21.4881 5.60214 21.3076 5.05996 20.8738 4.62617L19.9546 5.54541C20.1066 5.6974 20.219 5.91952 20.2826 6.39207C20.3486 6.88332 20.35 7.53882 20.35 8.50001H21.65ZM6.99999 3.85002C6.07556 3.85002 5.31685 3.84865 4.71884 3.92905C4.10214 4.01196 3.55996 4.1924 3.12617 4.62619L4.04541 5.54543C4.1974 5.39344 4.41952 5.28099 4.89207 5.21745C5.38331 5.15141 6.03881 5.15002 6.99999 5.15002L6.99999 3.85002ZM3.65 8.50002C3.65 7.53884 3.65138 6.88334 3.71743 6.39209C3.78096 5.91954 3.89341 5.69743 4.04541 5.54543L3.12617 4.62619C2.69237 5.05999 2.51193 5.60217 2.42902 6.21887C2.34862 6.81688 2.35 7.57559 2.35 8.50002H3.65ZM3 10.65H21V9.35H3V10.65ZM8.05078 13.35H8.00078V14.65H8.05078V13.35ZM8.05078 16.35H8.00078V17.65H8.05078V16.35ZM12.0508 13.35H12.0008V14.65H12.0508V13.35ZM12.0508 16.35H12.0008V17.65H12.0508V16.35ZM16.0508 13.35H16.0008V14.65H16.0508V13.35ZM16.0508 16.35H16.0008V17.65H16.0508V16.35ZM7.35 3V6H8.65V3H7.35ZM15.35 3V6H16.65V3H15.35Z" fill="#111827"></path>
+            </svg>
+            <h6 class="text-xl leading-8 font-semibold text-gray-900" th:text="${currentDay}">Today, January 2024</h6>
+          </div>
+          <div class="flex items-center gap-px rounded-lg bg-gray-100 p-1">
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-gray-500 transition-all duration-300 hover:bg-white hover:text-indigo-600">Day</button>
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-indigo-600 bg-white transition-all duration-300 hover:bg-white hover:text-indigo-600">Week</button>
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-gray-500 transition-all duration-300 hover:bg-white hover:text-indigo-600">Month</button>
+          </div>
+          <button class="py-2.5 pr-7 pl-5 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 5V15M15 10H5" stroke="white" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+            New Activity
+          </button>
+        </div>
+        <div class=" relative">
+          <div class="grid grid-cols-7 border-t border-gray-200 sticky top-0 left-0 w-full">
+              <div  class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Time Slot</div>
+              <div th:each="day : ${calendarDayList}" >
+                <div th:text="${day}" class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 7</div>
+              </div>
+          </div>
+<!--          <div  class="grid grid-cols-7 border-t border-gray-200 sticky top-0 left-0 w-full"> -->
+<!--            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900"></div>-->
+<!--            <div th:each="calendarDayData : ${listOfCalenderDayData}">-->
+<!--              <div th:text="${calendarDayData.weekDay} + ' ' + ${calendarDayData.dayOfMonth} + '.'"  class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 7</div>-->
+<!--            </div>-->
+<!-- <!--                <div th:each="i : ${#numbers.sequence(mondayDayOfMonth, mondayDayOfMonth+amountOfDays)}" th:value="${i}" th:text="'Jan.' + ${i} + ' ' + ${month}" class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 7</div>&ndash;&gt;-->
+<!--          </div>-->
+          <div class="hidden grid-cols-7 sm:grid w-full overflow-x-auto">
+
+<!--            <div th:each="row : ${calenderRows}">-->
+<!--              <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">-->
+<!--                <span class="text-xs font-semibold text-gray-400">07:00 am</span>-->
+<!--              </div>-->
+<!--                <div th:each="rowAppointment : ${row}">-->
+<!--                  <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">-->
+<!--                    <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">-->
+<!--                      <p th:text="'MS(' + ${rowAppointment.medistreamId} + ') - ' + ${rowAppointment.id}" class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>-->
+<!--                      <p th:text="${rowAppointment.startTime}" class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div th:each="row : ${listOfExtAppointment}">
+              <div th:each="rowAppointment : ${row.appointments}">
+                <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+                  <span th:text="${row.startTime}" class="text-xs font-semibold text-gray-400">07:00 am</span>
+                </div>
+                <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+                  <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                    <p th:text="'MS(' + ${rowAppointment.medistreamId} + ') - ' + ${rowAppointment.id}" class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>
+                    <p th:text="${rowAppointment.startTime}" class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>
+                <p class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-green-600 bg-green-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Workout and Yoga Session</p>
+                <p class="text-xs font-semibold text-green-600">06:00 - 07:55</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t  border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">08:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Project Task Review</p>
+                <p class="text-xs font-semibold text-blue-600">08:00 - 08:25</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">09:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-yellow-600 bg-yellow-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Breakfast with Dhruv Patel</p>
+                <p class="text-xs font-semibold text-yellow-600">08:00 - 09:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">10:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-green-600 bg-green-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Dancing Zumba class</p>
+                <p class="text-xs font-semibold text-green-600">09:30 - 10:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Doctor’s Appointment for Mother</p>
+                <p class="text-xs font-semibold text-purple-600">09:00 - 10:45</p>
+              </div>
+            </div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">11:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Daily Standup Meeting</p>
+                <p class="text-xs font-semibold text-blue-600">10:00 - 11:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-yellow-600 bg-yellow-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">School Friend’s Birthday Party</p>
+                <p class="text-xs font-semibold text-yellow-600">10:00 - 11:45</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">12:00 pm</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Meeting with Project Manager </p>
+                <p class="text-xs font-semibold text-blue-600">11:00 - 12:30</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+          </div>
+          <div class="flex sm:hidden border-t border-gray-200 items-center w-full">
+            <div class="flex flex-col">
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">07:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">08:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">09:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">10:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">11:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">12:00 pm</div>
+            </div>
+            <div class="grid grid-cols-1 w-full">
+              <div class="w-full h-20 border-b border-gray-200 p-1.5">
+                <div class="w-full h-full rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                  <p class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>
+                  <p class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>
+                </div>
+              </div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5">
+                <div class="w-full h-full rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                  <p class="text-xs font-normal text-gray-900 mb-px">Meeting with Project Manager </p>
+                  <p class="text-xs font-semibold text-blue-600">11:00 - 12:30</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="relative bg-stone-50 py-24">
+      <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+        <div class="flex flex-col md:flex-row max-md:gap-3 items-center justify-between mb-5">
+          <div class="flex items-center gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M17 4.50001L17 5.15001L17 4.50001ZM6.99999 4.50002L6.99999 3.85002L6.99999 4.50002ZM8.05078 14.65C8.40977 14.65 8.70078 14.359 8.70078 14C8.70078 13.641 8.40977 13.35 8.05078 13.35V14.65ZM8.00078 13.35C7.6418 13.35 7.35078 13.641 7.35078 14C7.35078 14.359 7.6418 14.65 8.00078 14.65V13.35ZM8.05078 17.65C8.40977 17.65 8.70078 17.359 8.70078 17C8.70078 16.641 8.40977 16.35 8.05078 16.35V17.65ZM8.00078 16.35C7.6418 16.35 7.35078 16.641 7.35078 17C7.35078 17.359 7.6418 17.65 8.00078 17.65V16.35ZM12.0508 14.65C12.4098 14.65 12.7008 14.359 12.7008 14C12.7008 13.641 12.4098 13.35 12.0508 13.35V14.65ZM12.0008 13.35C11.6418 13.35 11.3508 13.641 11.3508 14C11.3508 14.359 11.6418 14.65 12.0008 14.65V13.35ZM12.0508 17.65C12.4098 17.65 12.7008 17.359 12.7008 17C12.7008 16.641 12.4098 16.35 12.0508 16.35V17.65ZM12.0008 16.35C11.6418 16.35 11.3508 16.641 11.3508 17C11.3508 17.359 11.6418 17.65 12.0008 17.65V16.35ZM16.0508 14.65C16.4098 14.65 16.7008 14.359 16.7008 14C16.7008 13.641 16.4098 13.35 16.0508 13.35V14.65ZM16.0008 13.35C15.6418 13.35 15.3508 13.641 15.3508 14C15.3508 14.359 15.6418 14.65 16.0008 14.65V13.35ZM16.0508 17.65C16.4098 17.65 16.7008 17.359 16.7008 17C16.7008 16.641 16.4098 16.35 16.0508 16.35V17.65ZM16.0008 16.35C15.6418 16.35 15.3508 16.641 15.3508 17C15.3508 17.359 15.6418 17.65 16.0008 17.65V16.35ZM8.65 3C8.65 2.64101 8.35898 2.35 8 2.35C7.64102 2.35 7.35 2.64101 7.35 3H8.65ZM7.35 6C7.35 6.35899 7.64102 6.65 8 6.65C8.35898 6.65 8.65 6.35899 8.65 6H7.35ZM16.65 3C16.65 2.64101 16.359 2.35 16 2.35C15.641 2.35 15.35 2.64101 15.35 3H16.65ZM15.35 6C15.35 6.35899 15.641 6.65 16 6.65C16.359 6.65 16.65 6.35899 16.65 6H15.35ZM6.99999 5.15002L17 5.15001L17 3.85001L6.99999 3.85002L6.99999 5.15002ZM20.35 8.50001V17H21.65V8.50001H20.35ZM17 20.35H7V21.65H17V20.35ZM3.65 17V8.50002H2.35V17H3.65ZM7 20.35C6.03882 20.35 5.38332 20.3486 4.89207 20.2826C4.41952 20.2191 4.1974 20.1066 4.04541 19.9546L3.12617 20.8739C3.55996 21.3077 4.10214 21.4881 4.71885 21.571C5.31685 21.6514 6.07557 21.65 7 21.65V20.35ZM2.35 17C2.35 17.9245 2.34862 18.6832 2.42902 19.2812C2.51193 19.8979 2.69237 20.4401 3.12617 20.8739L4.04541 19.9546C3.89341 19.8026 3.78096 19.5805 3.71743 19.108C3.65138 18.6167 3.65 17.9612 3.65 17H2.35ZM20.35 17C20.35 17.9612 20.3486 18.6167 20.2826 19.108C20.219 19.5805 20.1066 19.8026 19.9546 19.9546L20.8738 20.8739C21.3076 20.4401 21.4881 19.8979 21.571 19.2812C21.6514 18.6832 21.65 17.9245 21.65 17H20.35ZM17 21.65C17.9244 21.65 18.6831 21.6514 19.2812 21.571C19.8979 21.4881 20.44 21.3077 20.8738 20.8739L19.9546 19.9546C19.8026 20.1066 19.5805 20.2191 19.1079 20.2826C18.6167 20.3486 17.9612 20.35 17 20.35V21.65ZM17 5.15001C17.9612 5.15 18.6167 5.15138 19.1079 5.21743C19.5805 5.28096 19.8026 5.39341 19.9546 5.54541L20.8738 4.62617C20.44 4.19238 19.8979 4.01194 19.2812 3.92902C18.6831 3.84862 17.9244 3.85001 17 3.85001L17 5.15001ZM21.65 8.50001C21.65 7.57557 21.6514 6.81686 21.571 6.21885C21.4881 5.60214 21.3076 5.05996 20.8738 4.62617L19.9546 5.54541C20.1066 5.6974 20.219 5.91952 20.2826 6.39207C20.3486 6.88332 20.35 7.53882 20.35 8.50001H21.65ZM6.99999 3.85002C6.07556 3.85002 5.31685 3.84865 4.71884 3.92905C4.10214 4.01196 3.55996 4.1924 3.12617 4.62619L4.04541 5.54543C4.1974 5.39344 4.41952 5.28099 4.89207 5.21745C5.38331 5.15141 6.03881 5.15002 6.99999 5.15002L6.99999 3.85002ZM3.65 8.50002C3.65 7.53884 3.65138 6.88334 3.71743 6.39209C3.78096 5.91954 3.89341 5.69743 4.04541 5.54543L3.12617 4.62619C2.69237 5.05999 2.51193 5.60217 2.42902 6.21887C2.34862 6.81688 2.35 7.57559 2.35 8.50002H3.65ZM3 10.65H21V9.35H3V10.65ZM8.05078 13.35H8.00078V14.65H8.05078V13.35ZM8.05078 16.35H8.00078V17.65H8.05078V16.35ZM12.0508 13.35H12.0008V14.65H12.0508V13.35ZM12.0508 16.35H12.0008V17.65H12.0508V16.35ZM16.0508 13.35H16.0008V14.65H16.0508V13.35ZM16.0508 16.35H16.0008V17.65H16.0508V16.35ZM7.35 3V6H8.65V3H7.35ZM15.35 3V6H16.65V3H15.35Z" fill="#111827"></path>
+            </svg>
+            <h6 class="text-xl leading-8 font-semibold text-gray-900">Today, January 2024</h6>
+          </div>
+          <div class="flex items-center gap-px rounded-lg bg-gray-100 p-1">
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-gray-500 transition-all duration-300 hover:bg-white hover:text-indigo-600">Day</button>
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-indigo-600 bg-white transition-all duration-300 hover:bg-white hover:text-indigo-600">Week</button>
+            <button class="rounded-lg py-2.5 px-5 text-sm font-medium text-gray-500 transition-all duration-300 hover:bg-white hover:text-indigo-600">Month</button>
+          </div>
+          <button class="py-2.5 pr-7 pl-5 bg-indigo-600 rounded-xl flex items-center gap-2 text-base font-semibold text-white transition-all duration-300 hover:bg-indigo-700">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 5V15M15 10H5" stroke="white" stroke-width="1.6" stroke-linecap="round"></path>
+            </svg>
+            New Activity
+          </button>
+        </div>
+        <div class=" relative">
+          <div class="grid grid-cols-7 border-t border-gray-200 sticky top-0 left-0 w-full">
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900"></div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 7</div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 8</div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-indigo-600">Jan 9</div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 10</div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 11</div>
+            <div class="p-3.5 flex items-center justify-center text-sm font-medium  text-gray-900">Jan 12</div>
+          </div>
+          <div class="hidden grid-cols-7 sm:grid w-full overflow-x-auto">
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">07:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>
+                <p class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-green-600 bg-green-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Workout and Yoga Session</p>
+                <p class="text-xs font-semibold text-green-600">06:00 - 07:55</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t  border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">08:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Project Task Review</p>
+                <p class="text-xs font-semibold text-blue-600">08:00 - 08:25</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">09:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-yellow-600 bg-yellow-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Breakfast with Dhruv Patel</p>
+                <p class="text-xs font-semibold text-yellow-600">08:00 - 09:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">10:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-green-600 bg-green-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Dancing Zumba class</p>
+                <p class="text-xs font-semibold text-green-600">09:30 - 10:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Doctor’s Appointment for Mother</p>
+                <p class="text-xs font-semibold text-purple-600">09:00 - 10:45</p>
+              </div>
+            </div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">11:00 am</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Daily Standup Meeting</p>
+                <p class="text-xs font-semibold text-blue-600">10:00 - 11:00</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-yellow-600 bg-yellow-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">School Friend’s Birthday Party</p>
+                <p class="text-xs font-semibold text-yellow-600">10:00 - 11:45</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 flex items-end transition-all hover:bg-stone-100">
+              <span class="text-xs font-semibold text-gray-400">12:00 pm</span>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100">
+              <div class="rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                <p class="text-xs font-normal text-gray-900 mb-px">Meeting with Project Manager </p>
+                <p class="text-xs font-semibold text-blue-600">11:00 - 12:30</p>
+              </div>
+            </div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-r border-gray-200 transition-all hover:bg-stone-100"></div>
+            <div class="h-32 lg:h-28 p-0.5 md:p-3.5   border-t border-gray-200 transition-all hover:bg-stone-100"></div>
+          </div>
+          <div class="flex sm:hidden border-t border-gray-200 items-center w-full">
+            <div class="flex flex-col">
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">07:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">08:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">09:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">10:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">11:00 am</div>
+              <div class="w-20 h-20 p-2 flex items-end text-xs font-semibold text-gray-400 border-b border-r border-gray-200">12:00 pm</div>
+            </div>
+            <div class="grid grid-cols-1 w-full">
+              <div class="w-full h-20 border-b border-gray-200 p-1.5">
+                <div class="w-full h-full rounded p-1.5 border-l-2 border-purple-600 bg-purple-50">
+                  <p class="text-xs font-normal text-gray-900 mb-px">Pickup the grandmother</p>
+                  <p class="text-xs font-semibold text-purple-600">06:00 - 07:30</p>
+                </div>
+              </div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5"></div>
+              <div class="w-full h-20 border-b border-gray-200 p-1.5">
+                <div class="w-full h-full rounded p-1.5 border-l-2 border-blue-600 bg-blue-50">
+                  <p class="text-xs font-normal text-gray-900 mb-px">Meeting with Project Manager </p>
+                  <p class="text-xs font-semibold text-blue-600">11:00 - 12:30</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="relative bg-stone-50">
+      <div class="bg-sky-400 w-full sm:w-40 h-40 rounded-full absolute top-1 opacity-20 max-sm:right-0 sm:left-56 z-0"></div>
+      <div class="bg-emerald-500 w-full sm:w-40 h-24 absolute top-0 -left-0 opacity-20 z-0"></div>
+      <div class="bg-purple-600 w-full sm:w-40 h-24 absolute top-40 -left-0 opacity-20 z-0"></div>
+      <div class="w-full py-24 relative z-10 backdrop-blur-3xl">
+        <div class="w-full max-w-7xl mx-auto px-2 lg:px-8">
+          <div class="grid grid-cols-12 gap-8 max-w-4xl mx-auto xl:max-w-full">
+            <div class="col-span-12 xl:col-span-5">
+              <h2 class="font-manrope text-3xl leading-tight text-gray-900 mb-1.5">Upcoming Events</h2>
+              <p class="text-lg font-normal text-gray-600 mb-8">Don’t miss schedule</p>
+              <div class="flex gap-5 flex-col">
+                <div th:each="appointment : ${top3appointmentsSchedule}">
+                      <div class="p-6 rounded-xl bg-white">
+                        <div class="flex items-center justify-between mb-3">
+                          <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                            <p class="text-base font-medium text-gray-900" th:text="'id: ' + ${appointment.dayLabel}">Jan 10,2020 - 10:00 - 11:00</p>
+                          </div>
+                          <div class="dropdown relative inline-flex">
+                            <button type="button" data-target="dropdown-default" class="dropdown-toggle inline-flex justify-center py-2.5 px-1 items-center gap-2 text-sm text-black rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:text-purple-600  ">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="4" viewBox="0 0 12 4" fill="none">
+                                <path d="M1.85624 2.00085H1.81458M6.0343 2.00085H5.99263M10.2124 2.00085H10.1707" stroke="currentcolor" stroke-width="2.5" stroke-linecap="round"></path>
+                              </svg>
+
+                            </button>
+                            <div id="dropdown-default" class="dropdown-menu rounded-xl shadow-lg bg-white absolute top-full -left-10 w-max mt-2 hidden" aria-labelledby="dropdown-default">
+                              <ul class="py-2">
+                                <li>
+                                  <a class="block px-6 py-2 text-xs hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                                    Edit
+                                  </a>
+                                </li>
+                                <li>
+                                  <a class="block px-6 py-2 text-xs hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                                    Remove
+                                  </a>
+                                </li>
+
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <h6 class="text-xl leading-8 font-semibold text-black mb-1" th:text="'Appointment Title: ' + ${appointment.duration}">Meeting with a friends</h6>
+                        <p class="text-base font-normal text-gray-600" th:text="'Appointment Description: ' + ${appointment.startTimestamp}">Meet-Up for Travel Destination Discussion</p>
+                      </div>
+                </div>
+
+
+              </div>
+            </div>
+            <div class="col-span-12 xl:col-span-7 px-2.5 py-5 sm:p-8 bg-gradient-to-b from-white/25 to-white xl:bg-white rounded-2xl max-xl:row-start-1">
+              <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-5">
+                <div class="flex items-center gap-4">
+                  <h5 class="text-xl leading-8 font-semibold text-gray-900">January 2024</h5>
+                  <div class="flex items-center">
+                    <button class="text-indigo-600 p-1 rounded transition-all duration-300 hover:text-white hover:bg-indigo-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M10.0002 11.9999L6 7.99971L10.0025 3.99719" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                    <button class="text-indigo-600 p-1 rounded transition-all duration-300 hover:text-white hover:bg-indigo-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6.00236 3.99707L10.0025 7.99723L6 11.9998" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="flex items-center rounded-md p-1 bg-indigo-50 gap-px">
+                  <button class="py-2.5 px-5 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-medium transition-all duration-300 hover:bg-indigo-600 hover:text-white">Day</button>
+                  <button class="py-2.5 px-5 rounded-lg bg-indigo-600 text-white text-sm font-medium transition-all duration-300 hover:bg-indigo-600 hover:text-white">Week</button>
+                  <button class="py-2.5 px-5 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-medium transition-all duration-300 hover:bg-indigo-600 hover:text-white">Month</button>
+                </div>
+              </div>
+              <div class="border border-indigo-200 rounded-xl">
+                <div class="grid grid-cols-7 rounded-t-3xl border-b border-indigo-200">
+                  <div class="py-3.5 border-r rounded-tl-xl border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Sun</div>
+                  <div class="py-3.5 border-r border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Mon</div>
+                  <div class="py-3.5 border-r border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Tue</div>
+                  <div class="py-3.5 border-r border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Wed</div>
+                  <div class="py-3.5 border-r border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Thu</div>
+                  <div class="py-3.5 border-r border-indigo-200 bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Fri</div>
+                  <div class="py-3.5 rounded-tr-xl bg-indigo-50 flex items-center justify-center text-sm font-medium text-indigo-600">Sat</div>
+                </div>
+                <div class="grid grid-cols-7 rounded-b-xl">
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50">
+                    <span class="text-xs font-semibold text-gray-400">27</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">28</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">29</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">30</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">31</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">1</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">2</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">3</span>
+                    <div class="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-purple-50 ">
+                      <p class="hidden xl:block text-xs font-medium text-purple-600 mb-px">Meeting</p>
+                      <span class="hidden xl:block text-xs font-normal text-purple-600 whitespace-nowrap">10:00 - 11:00</span>
+                      <p class="xl:hidden w-2 h-2 rounded-full bg-purple-600"></p>
+                    </div>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">4</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">5</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">6</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white relative border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">7</span>
+                    <div class="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-emerald-50 ">
+                      <p class="hidden xl:block text-xs font-medium text-emerald-600 mb-px whitespace-nowrap">Developer Meetup</p>
+                      <span class="hidden xl:block text-xs font-normal text-emerald-600 whitespace-nowrap">10:00 - 11:00</span>
+                      <p class="xl:hidden w-2 h-2 rounded-full bg-emerald-600"></p>
+                    </div>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">8</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-indigo-600 sm:text-white sm:w-6 sm:h-6 rounded-full sm:flex items-center justify-center sm:bg-indigo-600">9</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">10</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">11</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">12</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">13</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">14</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">15</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">16</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">17</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">18</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">19</span>
+                    <div class="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-sky-50 ">
+                      <p class="hidden xl:block text-xs font-medium text-sky-600 mb-px whitespace-nowrap">Developer Meetup</p>
+                      <span class="hidden xl:block text-xs font-normal text-sky-600 whitespace-nowrap">10:00 - 11:00</span>
+                      <p class="xl:hidden w-2 h-2 rounded-full bg-sky-600"></p>
+                    </div>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">20</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">21</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">22</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">23</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">24</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">25</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">26</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">27</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">28</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">29</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">30</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-indigo-200 rounded-bl-xl transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-900">31</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">1</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">2</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">3</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">4</span>
+                    <div class="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-purple-50 ">
+                      <p class="hidden xl:block text-xs font-medium text-purple-600 mb-px whitespace-nowrap">Friends Meet</p>
+                      <span class="hidden xl:block text-xs font-normal text-purple-600 whitespace-nowrap">09:00 - 13:42</span>
+                      <p class="xl:hidden w-2 h-2 rounded-full bg-purple-600"></p>
+                    </div>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">5</span>
+                  </div>
+                  <div class="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-indigo-200 rounded-br-xl transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
+                    <span class="text-xs font-semibold text-gray-400">6</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="relative py-8 sm:p-8">
+      <div class="w-full max-w-7xl mx-auto px-4 lg:px-8 xl:px-14">
+        <div class="flex  items-center justify-between gap-3 mb-5">
+          <div class="flex items-center gap-4">
+            <h5 class="text-xl leading-8 font-semibold text-gray-900">January 2024</h5>
+            <div class="flex items-center gap-2">
+              <button class="hidden md:flex py-2 pl-1.5 pr-3 rounded-md bg-gray-50 border border-gray-300 items-center gap-1.5 text-xs font-medium text-gray-900 transition-all duration-500 hover:bg-gray-100">
+                <svg class="pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M11.3333 3L11.3333 3.65L11.3333 3ZM4.66666 3.00002L4.66666 2.35002L4.66666 3.00002ZM5.36719 9.98333C5.72617 9.98333 6.01719 9.69232 6.01719 9.33333C6.01719 8.97435 5.72617 8.68333 5.36719 8.68333V9.98333ZM5.33385 8.68333C4.97487 8.68333 4.68385 8.97435 4.68385 9.33333C4.68385 9.69232 4.97487 9.98333 5.33385 9.98333V8.68333ZM5.36719 11.9833C5.72617 11.9833 6.01719 11.6923 6.01719 11.3333C6.01719 10.9743 5.72617 10.6833 5.36719 10.6833V11.9833ZM5.33385 10.6833C4.97487 10.6833 4.68385 10.9743 4.68385 11.3333C4.68385 11.6923 4.97487 11.9833 5.33385 11.9833V10.6833ZM8.03385 9.98333C8.39284 9.98333 8.68385 9.69232 8.68385 9.33333C8.68385 8.97435 8.39284 8.68333 8.03385 8.68333V9.98333ZM8.00052 8.68333C7.64154 8.68333 7.35052 8.97435 7.35052 9.33333C7.35052 9.69232 7.64154 9.98333 8.00052 9.98333V8.68333ZM8.03385 11.9833C8.39284 11.9833 8.68385 11.6923 8.68385 11.3333C8.68385 10.9743 8.39284 10.6833 8.03385 10.6833V11.9833ZM8.00052 10.6833C7.64154 10.6833 7.35052 10.9743 7.35052 11.3333C7.35052 11.6923 7.64154 11.9833 8.00052 11.9833V10.6833ZM10.7005 9.98333C11.0595 9.98333 11.3505 9.69232 11.3505 9.33333C11.3505 8.97435 11.0595 8.68333 10.7005 8.68333V9.98333ZM10.6672 8.68333C10.3082 8.68333 10.0172 8.97435 10.0172 9.33333C10.0172 9.69232 10.3082 9.98333 10.6672 9.98333V8.68333ZM10.7005 11.9833C11.0595 11.9833 11.3505 11.6923 11.3505 11.3333C11.3505 10.9743 11.0595 10.6833 10.7005 10.6833V11.9833ZM10.6672 10.6833C10.3082 10.6833 10.0172 10.9743 10.0172 11.3333C10.0172 11.6923 10.3082 11.9833 10.6672 11.9833V10.6833ZM5.98333 2C5.98333 1.64101 5.69232 1.35 5.33333 1.35C4.97435 1.35 4.68333 1.64101 4.68333 2H5.98333ZM4.68333 4C4.68333 4.35898 4.97435 4.65 5.33333 4.65C5.69232 4.65 5.98333 4.35898 5.98333 4H4.68333ZM11.3167 2C11.3167 1.64101 11.0257 1.35 10.6667 1.35C10.3077 1.35 10.0167 1.64101 10.0167 2H11.3167ZM10.0167 4C10.0167 4.35898 10.3077 4.65 10.6667 4.65C11.0257 4.65 11.3167 4.35898 11.3167 4H10.0167ZM4.66666 3.65002L11.3333 3.65L11.3333 2.35L4.66666 2.35002L4.66666 3.65002ZM13.35 5.66667V11.3334H14.65V5.66667H13.35ZM11.3333 13.35H4.66667V14.65H11.3333V13.35ZM2.65 11.3334V5.66668H1.35V11.3334H2.65ZM4.66667 13.35C4.01975 13.35 3.59995 13.3486 3.29025 13.307C2.99924 13.2679 2.90451 13.2042 2.85014 13.1499L1.9309 14.0691C2.26707 14.4053 2.68186 14.5369 3.11703 14.5954C3.53349 14.6514 4.0565 14.65 4.66667 14.65V13.35ZM1.35 11.3334C1.35 11.9435 1.34862 12.4665 1.40461 12.883C1.46312 13.3182 1.59474 13.733 1.9309 14.0691L2.85014 13.1499C2.79578 13.0955 2.73214 13.0008 2.69302 12.7098C2.65138 12.4001 2.65 11.9803 2.65 11.3334H1.35ZM13.35 11.3334C13.35 11.9803 13.3486 12.4001 13.307 12.7098C13.2679 13.0008 13.2042 13.0955 13.1499 13.1499L14.0691 14.0691C14.4053 13.733 14.5369 13.3182 14.5954 12.883C14.6514 12.4665 14.65 11.9435 14.65 11.3334H13.35ZM11.3333 14.65C11.9435 14.65 12.4665 14.6514 12.883 14.5954C13.3181 14.5369 13.7329 14.4053 14.0691 14.0691L13.1499 13.1499C13.0955 13.2042 13.0008 13.2679 12.7098 13.307C12.4 13.3486 11.9802 13.35 11.3333 13.35V14.65ZM11.3333 3.65C11.9802 3.65 12.4 3.65138 12.7098 3.69302C13.0008 3.73215 13.0955 3.79578 13.1499 3.85015L14.0691 2.93091C13.7329 2.59474 13.3181 2.46312 12.883 2.40461C12.4665 2.34862 11.9435 2.35 11.3333 2.35L11.3333 3.65ZM14.65 5.66667C14.65 5.05651 14.6514 4.53349 14.5954 4.11703C14.5369 3.68187 14.4053 3.26707 14.0691 2.93091L13.1499 3.85015C13.2042 3.90451 13.2679 3.99924 13.307 4.29025C13.3486 4.59996 13.35 5.01976 13.35 5.66667H14.65ZM4.66666 2.35002C4.0565 2.35002 3.53349 2.34864 3.11702 2.40463C2.68186 2.46314 2.26707 2.59476 1.9309 2.93092L2.85014 3.85016C2.90451 3.7958 2.99924 3.73216 3.29025 3.69304C3.59995 3.6514 4.01975 3.65002 4.66666 3.65002L4.66666 2.35002ZM2.65 5.66668C2.65 5.01977 2.65138 4.59997 2.69302 4.29027C2.73214 3.99926 2.79578 3.90452 2.85014 3.85016L1.9309 2.93092C1.59474 3.26709 1.46312 3.68188 1.40461 4.11704C1.34862 4.53351 1.35 5.05652 1.35 5.66668H2.65ZM2 7.31667H14V6.01667H2V7.31667ZM5.36719 8.68333H5.33385V9.98333H5.36719V8.68333ZM5.36719 10.6833H5.33385V11.9833H5.36719V10.6833ZM8.03385 8.68333H8.00052V9.98333H8.03385V8.68333ZM8.03385 10.6833H8.00052V11.9833H8.03385V10.6833ZM10.7005 8.68333H10.6672V9.98333H10.7005V8.68333ZM10.7005 10.6833H10.6672V11.9833H10.7005V10.6833ZM4.68333 2V4H5.98333V2H4.68333ZM10.0167 2V4H11.3167V2H10.0167Z" fill="#6B7280"></path>
+                </svg>Today
+              </button>
+              <button class="text-gray-500 rounded transition-all duration-300 hover:bg-gray-100 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10.0002 11.9999L6 7.99971L10.0025 3.99719" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></button>
+              <button class="text-gray-500 rounded transition-all duration-300 hover:bg-gray-100 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6.00236 3.99707L10.0025 7.99723L6 11.9998" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg></button>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center gap-3 ">
+            <div class="flex items-center gap-2">
+              <button class="p-3 text-gray-500 flex items-center justify-center transition-all duration-300 hover:text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M9.9584 13.2844V8.28435M9.9584 5.83333C9.97468 5.83333 10.0001 5.83333 10.0001 5.83333M17.5001 10C17.5001 14.1421 14.1422 17.5 10.0001 17.5C5.85793 17.5 2.50006 14.1421 2.50006 10C2.50006 5.85786 5.85793 2.5 10.0001 2.5C14.1422 2.5 17.5001 5.85786 17.5001 10Z" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round"></path>
+                </svg>
+              </button>
+              <span class="w-px h-7 bg-gray-200"></span>
+              <button class="p-3 text-gray-500 flex items-center justify-center transition-all duration-300 hover:text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M16.7501 9.20285C17.4658 8.79486 17.7119 7.89657 17.3012 7.19137L16.559 5.91699C16.1385 5.19489 15.1995 4.94638 14.466 5.36301C13.4469 5.94185 12.1716 5.19438 12.1716 4.03885C12.1716 3.19732 11.4764 2.5 10.6188 2.5H9.17632C8.33949 2.5 7.66111 3.16571 7.66111 3.9869V4.09222C7.66111 5.19157 6.44713 5.8776 5.4782 5.3258C4.78224 4.92946 3.89057 5.16345 3.48911 5.84779L2.70103 7.19113C2.28763 7.89582 2.5327 8.79589 3.24919 9.20432C4.24554 9.77228 4.24337 11.1862 3.24904 11.7576C2.53341 12.1688 2.28715 13.0712 2.7009 13.7764L3.48911 15.12C3.89057 15.8043 4.78478 16.0369 5.48074 15.6406C6.4466 15.0905 7.66111 15.7719 7.66111 16.8677C7.66111 17.6529 8.30976 18.2895 9.10991 18.2895H10.6853C11.5061 18.2895 12.1716 17.6365 12.1716 16.831C12.1716 15.7075 13.4115 15.0058 14.4024 15.5686L14.466 15.6048C15.1995 16.0214 16.1385 15.7729 16.559 15.0508L17.3013 13.7762C17.7124 13.0704 17.4651 12.1699 16.7502 11.7591C15.7547 11.1871 15.7526 9.77146 16.7501 9.20285Z" stroke="currentcolor" stroke-width="1.3"></path>
+                  <path d="M12.68 10.3947C12.68 11.8481 11.4794 13.0263 9.99834 13.0263C8.5173 13.0263 7.31668 11.8481 7.31668 10.3947C7.31668 8.94136 8.5173 7.76316 9.99834 7.76316C11.4794 7.76316 12.68 8.94136 12.68 10.3947Z" stroke="currentcolor" stroke-width="1.3"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="flex items-center gap-px p-1 rounded-md bg-gray-100">
+              <button class="py-2.5 px-5 rounded-lg bg-gray-100 text-sm font-medium text-gray-900 transition-all duration-300 hover:bg-white">Day</button>
+              <button class="py-2.5 px-5 rounded-lg bg-white text-sm font-medium text-gray-900 transition-all duration-300 hover:bg-white">Week</button>
+              <button class="py-2.5 px-5 rounded-lg bg-gray-100 text-sm font-medium text-gray-900 transition-all duration-300 hover:bg-white">Month</button>
+            </div>
+          </div>
+          <div class="dropdown relative inline-flex md:hidden">
+            <button type="button" data-target="dropdown-default" class="dropdown-toggle inline-flex justify-center items-center gap-2 py-1.5 px-2.5 text-sm bg-gray-50 text-gray-900 rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-gray-100 ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M3 3H21M3 15H21M7 9H16.5M7 21H16.5" stroke="currentcolor" stroke-width="1.6" stroke-linecap="round"></path>
+              </svg>
+              <svg class="dropdown-open:rotate-180 w-2.5 h-2.5 text-gray-600" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+            </button>
+            <div id="dropdown-default" class="dropdown-menu rounded-xl shadow-lg bg-white absolute top-full w-max -left-20 mt-2 open" aria-labelledby="dropdown-default">
+              <ul class="py-2">
+                <li>
+                  <a class="block px-6 py-2 hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                    Current Date
+                  </a>
+                </li>
+                <li>
+                  <a class="block px-6 py-2 hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                    Add Event
+                  </a>
+                </li>
+                <li class="bg-gray-300 w-full h-px"></li>
+                <li>
+                  <a class="block px-6 py-2 hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                    Viwe Day
+                  </a>
+                </li>
+                <li>
+                  <a class="block px-6 py-2 hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                    Viwe Week
+                  </a>
+                </li>
+                <li>
+                  <a class="block px-6 py-2 hover:bg-gray-100 text-gray-600 font-medium" href="javascript:;">
+                    Viwe month
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="border border-gray-200">
+          <div class="grid grid-cols-7  divide-gray-200 border-b border-gray-200">
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Sun</span>
+              <span class="text-sm font-medium text-gray-900">09</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Mon</span>
+              <span class="text-sm font-medium text-gray-900">10</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Tue</span>
+              <span class="text-sm font-medium text-gray-900">11</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Wed</span>
+              <span class="text-sm font-medium text-gray-900">12</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Thu</span>
+              <span class="text-sm font-medium text-gray-900">13</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200">
+              <span class="text-sm font-medium text-gray-500">Fri</span>
+              <span class="text-sm font-medium text-gray-900">14</span>
+            </div>
+            <div class="p-3.5 flex flex-col sm:flex-row items-center justify-between">
+              <span class="text-sm font-medium text-gray-500">Sat</span>
+              <span class="text-sm font-medium text-gray-900">15</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-7 divide-gray-200">
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">27</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">28</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">29</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">30</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">31</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">1</span>
+            </div>
+            <div class="p-3.5  border-b border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">2</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">3</span>
+              <span class="hidden lg:block text-xs font-medium text-gray-500">Meeting with marketing department</span>
+              <span class="lg:hidden w-2 h-2 rounded-full bg-gray-400"></span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">4</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">5</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">6</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">7</span>
+              <span class="hidden lg:block text-xs font-medium text-gray-500">Developer Meetup</span>
+              <span class="lg:hidden w-2 h-2 rounded-full bg-gray-400"></span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">8</span>
+            </div>
+            <div class="p-3.5  border-b  border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">9</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">10</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">11</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-white flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600">12</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">13</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">14</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">15</span>
+            </div>
+            <div class="p-3.5  border-b border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">16</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">17</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">18</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">19</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">20</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">21</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">22</span>
+            </div>
+            <div class="p-3.5  border-b border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">23</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">24</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">25</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">26</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">27</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">28</span>
+            </div>
+            <div class="p-3.5  border-b border-r border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">29</span>
+            </div>
+            <div class="p-3.5  border-b border-gray-200   xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">30</span>
+            </div>
+            <div class="p-3.5    xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full ">31</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">1</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">2</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">3</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">4</span>
+              <span class="hidden lg:block text-xs font-medium text-gray-500">Meet with friends <br> 9PM</span>
+              <span class="lg:hidden w-2 h-2 rounded-full bg-gray-400"></span>
+            </div>
+
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">5</span>
+            </div>
+            <div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100">
+              <span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full ">6</span>
+            </div>
+          </div>
+        </div>
+        <div class="w-full lg:hidden py-8 px-2.5 ">
+          <div class="bg-gray-50 w-full rounded-xl">
+            <div class="p-3 w-full flex items-center justify-between group transition-all duration-300">
+              <div class="flex flex-col gap-2">
+                <span class="text-sm font-medium text-gray-900">Meet with friends</span>
+                <div class="flex items-center gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8.99998V13L15 16M3 5.12132L5.10714 3M20.998 5.12657L18.8909 3.00525M20 13C20 17.4183 16.4183 21 12 21C7.58172 21 4 17.4183 4 13C4 8.5817 7.58172 4.99998 12 4.99998C16.4183 4.99998 20 8.5817 20 13Z" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  <span class="text-xs font-medium text-gray-600">9AM</span>
+                </div>
+              </div>
+              <button class="py-1 px-2 rounded border border-gray-400 text-xs font-medium text-gray-900 opacity-0 transition-all duration-500 group-hover:opacity-100">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </body>
+</html>
