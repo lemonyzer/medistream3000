@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class PatientController(val patientenRepository: PatientEntityRepository) {
 
-    //val patientenRepository : PatientEntityRepository = patientenRepository
-
     @GetMapping("/hello")
     fun home(): String {
         return "Hello World"

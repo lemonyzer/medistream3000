@@ -319,10 +319,41 @@ class PostHtmxController (
 
     @GetMapping("/appointment/{id}/edit")
     fun getAppointmentForEdit(@PathVariable id: Long?, model: Model): String {
+        val staticLogger = KotlinLogging.logger {}
+        staticLogger.info("@GetMapping(\"/appointment/{$id}/edit\")")
         val appointment = appointmentRepository.findById(id!!)
         model.addAttribute("appointment", appointment.get())    // : Appointment not : Optional!
-        return "blog/edit-appointment-form :: #edit-form-container"
+        return "medistream/edit-appointment-modal"
+        //return "blog/edit-appointment-form :: #edit-form-container"
     }
+
+    @GetMapping("/appointment/{id}/actions")
+    fun getAppointmentForAction(@PathVariable id: Long?, model: Model): String {
+        val staticLogger = KotlinLogging.logger {}
+        staticLogger.info("@GetMapping(\"/appointment/{$id}/actions\")")
+        val appointment = appointmentRepository.findById(id!!)
+        model.addAttribute("appointment", appointment.get())    // : Appointment not : Optional!
+        return "medistream/actions-appointment-modal"
+        //return "blog/edit-appointment-form :: #edit-form-container"
+    }
+
+    @PostMapping("/editAppointmentModal")
+    fun editAppointment(appointment: Appointment, model: Model) : String {
+        val staticLogger = KotlinLogging.logger {}
+        staticLogger.info("@PostMapping(\"/editAppointmentModal) with $appointment")
+        appointmentRepository.save(appointment)
+        return "redirect:/htmx/posts"
+    }
+
+   @PostMapping("/actionsAppointmentModal")
+   fun actionsAppointment(id: Long?, booked: Int?, model: Model) : String {
+       val staticLogger = KotlinLogging.logger {}
+       staticLogger.info("@PostMapping(\"/actionsAppointmentModal) with id=$id and booked=$booked")
+       val appointment = appointmentRepository.findById(id!!)
+       appointment.get().booked = booked!!
+       appointmentRepository.save(appointment.get())
+       return "redirect:/htmx/posts"
+   }
 
     @PatchMapping("/{id}")
     fun updatePost(@PathVariable id: Long?, @RequestParam text: String?, model: Model): String {

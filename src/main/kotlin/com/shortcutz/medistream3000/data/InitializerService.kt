@@ -3,7 +3,6 @@ package com.shortcutz.medistream3000.data
 import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime

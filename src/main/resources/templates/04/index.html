@@ -39,14 +39,24 @@
                                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Title</th>
                                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Email</th>
                                     <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Role</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">CRUD</th>
                                 </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-800">
                                 <tr th:each="user : ${users}">
-                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0" th:text="${user.name()}">Name</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.title()}">Title</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.email()}">Email</td>
+                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0" th:text="${user.name}">Name</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.title}">Title</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.email}">Email</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.role}">Role</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" >
+<!--                                        th:hx-get="/users/editUserModal/${user.id}"-->
+                                        <!-- hx-get="@{/users/editUserModal/{id}(id=${user.id})}" -->
+                                        <button type="button"
+                                                th:hx-get="@{/users/editUserModal/{id}(id=${user.id})}"
+                                                hx-target="body"
+                                                hx-swap="beforeend"
+                                                class="block rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                    >Edit user</button></td>
                                 </tr>
 
                                 <!-- More people... -->
@@ -54,14 +64,14 @@
                             </table>
                         </div>
                     </div>
-                    <div id="user-list">
-                        <div th:each="user : ${users}">
-                            <div class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0" th:text="${user.name()}">Name</div>
-                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.title()}">Title</div>
-                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.email()}">Email</div>
-                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.role}">Role</div>
-                        </div>
-                    </div>
+<!--                    <div id="user-list">-->
+<!--                        <div th:each="user : ${users}">-->
+<!--                            <div class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0" th:text="${user.name}">Name</div>-->
+<!--                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.title}">Title</div>-->
+<!--                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.email}">Email</div>-->
+<!--                            <div class="whitespace-nowrap px-3 py-4 text-sm text-gray-300" th:text="${user.role}">Role</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
                 </div>
             </div>
         </div>
